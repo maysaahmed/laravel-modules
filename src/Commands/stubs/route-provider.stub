@@ -2,8 +2,7 @@
 
 namespace $NAMESPACE$;
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
 class $CLASS$ extends ServiceProvider
 {
@@ -23,7 +22,7 @@ class $CLASS$ extends ServiceProvider
      */
     public function boot()
     {
-        parent::boot();
+        $this->map();
     }
 
     /**
@@ -47,9 +46,11 @@ class $CLASS$ extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        Route::middleware('web')
-            ->namespace($this->moduleNamespace)
-            ->group(module_path('$MODULE$', '$WEB_ROUTES_PATH$'));
+        app()->router->group([
+            'namespace' => $this->moduleNamespace
+        ], function ($router) {
+            require module_path('$MODULE$', '$WEB_ROUTES_PATH$');
+        });
     }
 
     /**
@@ -61,9 +62,11 @@ class $CLASS$ extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        Route::prefix('api')
-            ->middleware('api')
-            ->namespace($this->moduleNamespace)
-            ->group(module_path('$MODULE$', '$API_ROUTES_PATH$'));
+        app()->router->group([
+            'namespace' => $this->moduleNamespace,
+            'prefix' => 'api'
+        ], function ($router) {
+            require module_path('$MODULE$', '$API_ROUTES_PATH$');
+        });
     }
 }
